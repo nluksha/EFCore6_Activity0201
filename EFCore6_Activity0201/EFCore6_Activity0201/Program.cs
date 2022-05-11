@@ -10,8 +10,12 @@ BuildConfiguration();
 BuildOptions();
 // ListPeople();
 
-ListPeopleThenOrderAndTake();
-QueryPeopleOrderedToListAndTake();
+// ListPeopleThenOrderAndTake();
+// QueryPeopleOrderedToListAndTake();
+
+Console.WriteLine("Please enter the name:");
+var res = Console.ReadLine();
+FilteredPeople(res);
 
 
 void BuildConfiguration()
@@ -67,6 +71,24 @@ void QueryPeopleOrderedToListAndTake()
         foreach (var person in res)
         {
             Console.WriteLine($"{person.FirstName} {person.LastName}");
+        }
+    }
+}
+
+void FilteredPeople(string filter)
+{
+    using (var db = new AdventureWorksContext(optionsBuilder.Options))
+    {
+        var searchTerm = filter.ToLower();
+        var query = db.People.Where(x =>
+            x.LastName.ToLower().Contains(searchTerm)
+            || x.FirstName.ToLower().Contains(searchTerm)
+            || x.PersonType.ToLower().Equals(searchTerm)
+        );
+
+        foreach (var person in query)
+        {
+            Console.WriteLine($"{person.FirstName} {person.LastName} {person.PersonType}");
         }
     }
 }
