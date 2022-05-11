@@ -8,7 +8,11 @@ DbContextOptionsBuilder<AdventureWorksContext> optionsBuilder;
 
 BuildConfiguration();
 BuildOptions();
-ListPeople();
+// ListPeople();
+
+ListPeopleThenOrderAndTake();
+QueryPeopleOrderedToListAndTake();
+
 
 void BuildConfiguration()
 {
@@ -34,6 +38,33 @@ void ListPeople()
             .ToList();
 
         foreach (var person in people)
+        {
+            Console.WriteLine($"{person.FirstName} {person.LastName}");
+        }
+    }
+}
+
+void ListPeopleThenOrderAndTake()
+{
+    using (var db = new AdventureWorksContext(optionsBuilder.Options))
+    {
+        var people = db.People.ToList().OrderByDescending(x => x.LastName);
+
+        foreach (var person in people.Take(10))
+        {
+            Console.WriteLine($"{person.FirstName} {person.LastName}");
+        }
+    }
+}
+
+void QueryPeopleOrderedToListAndTake()
+{
+    using (var db = new AdventureWorksContext(optionsBuilder.Options))
+    {
+        var people = db.People.OrderByDescending(x => x.LastName);
+        var res = people.Take(10);
+
+        foreach (var person in res)
         {
             Console.WriteLine($"{person.FirstName} {person.LastName}");
         }
