@@ -14,6 +14,8 @@ namespace EFCore6_Activity0201.DBLibrary
         public AdventureWorksContext(DbContextOptions<AdventureWorksContext> options)
             : base(options)
         {
+            // Set by default AsNoTracking()
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         public virtual DbSet<Address> Addresses { get; set; } = null!;

@@ -15,7 +15,14 @@ BuildOptions();
 
 Console.WriteLine("Please enter the name:");
 var res = Console.ReadLine();
-FilteredPeople(res);
+
+int pageSize = 10;
+for (int pageNumber = 0; pageNumber < 10; pageNumber++)
+{
+    Console.WriteLine($"Page {pageNumber + 1}");
+    FiltredAndPagedResult(res, pageNumber, pageSize);
+}
+
 
 
 void BuildConfiguration()
@@ -85,6 +92,27 @@ void FilteredPeople(string filter)
             || x.FirstName.ToLower().Contains(searchTerm)
             || x.PersonType.ToLower().Equals(searchTerm)
         );
+
+        foreach (var person in query)
+        {
+            Console.WriteLine($"{person.FirstName} {person.LastName} {person.PersonType}");
+        }
+    }
+}
+
+void FiltredAndPagedResult(string filter, int pageNumber, int pageSize)
+{
+    using (var db = new AdventureWorksContext(optionsBuilder.Options))
+    {
+        var searchTerm = filter.ToLower();
+        var query = db.People.Where(x =>
+            x.LastName.ToLower().Contains(searchTerm)
+            || x.FirstName.ToLower().Contains(searchTerm)
+            || x.PersonType.ToLower().Equals(searchTerm)
+        )
+            .OrderBy( x => x.LastName)
+            .Skip(pageNumber * pageSize)
+            .Take(pageSize);
 
         foreach (var person in query)
         {
