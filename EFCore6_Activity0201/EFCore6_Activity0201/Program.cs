@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using EFCore6_Activity0201.DBLibrary;
+using EFCore6_Activity0201.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -13,6 +14,7 @@ BuildOptions();
 // ListPeopleThenOrderAndTake();
 // QueryPeopleOrderedToListAndTake();
 
+/*
 Console.WriteLine("Please enter the name:");
 var res = Console.ReadLine();
 
@@ -22,8 +24,12 @@ for (int pageNumber = 0; pageNumber < 10; pageNumber++)
     Console.WriteLine($"Page {pageNumber + 1}");
     FiltredAndPagedResult(res, pageNumber, pageSize);
 }
+*/
 
-
+// ListAllSalespeople();
+// ShowAllSalespeopleUsingProjection();
+// GenerateSalesReportData();
+GenerateSalesReportDataToDTO();
 
 void BuildConfiguration()
 {
@@ -117,6 +123,129 @@ void FiltredAndPagedResult(string filter, int pageNumber, int pageSize)
         foreach (var person in query)
         {
             Console.WriteLine($"{person.FirstName} {person.LastName} {person.PersonType}");
+        }
+    }
+}
+
+void ListAllSalespeople()
+{
+    using (var db = new AdventureWorksContext(optionsBuilder.Options))
+    {
+        var salespeople = db.SalesPeople
+            .Include(x => x.BusinessEntity)
+            .ThenInclude(y => y.BusinessEntity)
+            .AsNoTracking()
+            .ToList();
+
+        foreach (var sp in salespeople)
+        {
+            Console.WriteLine(GetSalespersonDetail(sp));
+        }
+    }
+}
+
+string GetSalespersonDetail(SalesPerson sp)
+{
+    return $"Id: {sp.BusinessEntityId}\t|TID: {sp.TerritoryId}\t| Quota: {sp.SalesQuota}\t| Bonus: {sp.Bonus}\t| YTDSales: {sp.SalesYtd}\t| Name: {sp.BusinessEntity?.BusinessEntity?.FirstName ?? ""}, {sp.BusinessEntity?.BusinessEntity?.LastName ?? ""}";
+}
+
+void ShowAllSalespeopleUsingProjection()
+{
+    using (var db = new AdventureWorksContext(optionsBuilder.Options))
+    {
+        var salespeople = db.SalesPeople
+            .AsNoTracking()
+            .Select(x => new
+            {
+                x.BusinessEntityId,
+                x.BusinessEntity.BusinessEntity.FirstName,
+                x.BusinessEntity.BusinessEntity.LastName,
+                x.SalesQuota,
+                x.SalesYtd,
+                x.SalesLastYear
+            })
+            .ToList();
+
+        foreach (var sp in salespeople)
+        {
+            Console.WriteLine($"BID: {sp.BusinessEntityId} | Name: {sp.LastName}, {sp.FirstName} | Quota: {sp.SalesQuota} | YTD Sales: {sp.SalesYtd} | SalesLastYear: {sp.SalesLastYear}");
+        }
+    }
+}
+
+void GenerateSalesReportData()
+{
+    Console.WriteLine("What is the minimum amount of sales?");
+    var input = Console.ReadLine();
+    decimal filter = 0.0m;
+
+    if (!decimal.TryParse(input, out filter))
+    {
+        Console.WriteLine("Bad input");
+        return;
+    }
+
+    using (var db = new AdventureWorksContext(optionsBuilder.Options))
+    {
+        var salesReportData = db.SalesPeople.Select(sp => new
+        {
+            Id = sp.BusinessEntityId,
+            sp.BusinessEntity.BusinessEntity.FirstName,
+            sp.BusinessEntity.BusinessEntity.LastName,
+            sp.SalesYtd,
+            Territories = sp.SalesTerritoryHistories.Select(y => y.Territory.Name),
+            OrderCount = sp.SalesOrderHeaders.Count(),
+            TotalProductsSold = sp.SalesOrderHeaders
+                .SelectMany(y => y.SalesOrderDetails)
+                .Sum(z => z.OrderQty)
+        })
+            .Where(srdata => srdata.SalesYtd > filter)
+            .OrderBy(srds => srds.LastName)
+            .ThenBy(srds => srds.FirstName)
+            .ThenByDescending(srds => srds.SalesYtd)
+            .ToList();
+
+        foreach (var srd in salesReportData)
+        {
+            Console.WriteLine($"{srd.Id} | {srd.LastName}, {srd.FirstName} | {srd.SalesYtd} | {string.Join(",", srd.Territories)} | Order Count: {srd.OrderCount} | Products Sold: {srd.TotalProductsSold}");
+        }
+    }
+}
+
+void GenerateSalesReportDataToDTO()
+{
+    Console.WriteLine("What is the minimum amount of sales?");
+    var input = Console.ReadLine();
+    decimal filter = 0.0m;
+
+    if (!decimal.TryParse(input, out filter))
+    {
+        Console.WriteLine("Bad input");
+        return;
+    }
+
+    using (var db = new AdventureWorksContext(optionsBuilder.Options))
+    {
+        var salesReportData = db.SalesPeople.Select(sp => new SalesReportListingDto
+        {
+            BusinessEntityId = sp.BusinessEntityId,
+            FirstName = sp.BusinessEntity.BusinessEntity.FirstName,
+            LastName = sp.BusinessEntity.BusinessEntity.LastName,
+            SalesYtd = sp.SalesYtd,
+            Territories = sp.SalesTerritoryHistories.Select(y => y.Territory.Name),
+            TotalOrders = sp.SalesOrderHeaders.Count(),
+            TotalProductsSold = sp.SalesOrderHeaders
+                .SelectMany(y => y.SalesOrderDetails)
+                .Sum(z => z.OrderQty)
+        })
+            .Where(srdata => srdata.SalesYtd > filter)
+            .OrderBy(srds => srds.LastName)
+            .ThenBy(srds => srds.FirstName)
+            .ThenByDescending(srds => srds.SalesYtd);
+
+        foreach (var srd in salesReportData)
+        {
+            Console.WriteLine(srd.ToString());
         }
     }
 }
