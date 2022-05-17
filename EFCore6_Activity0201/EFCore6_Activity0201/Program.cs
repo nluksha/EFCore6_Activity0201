@@ -30,6 +30,8 @@ for (int pageNumber = 0; pageNumber < 10; pageNumber++)
 // ShowAllSalespeopleUsingProjection();
 // GenerateSalesReportData();
 GenerateSalesReportDataToDTO();
+GenerateSalesReportDataToDTO();
+GenerateSalesReportDataToDTO();
 
 void BuildConfiguration()
 {

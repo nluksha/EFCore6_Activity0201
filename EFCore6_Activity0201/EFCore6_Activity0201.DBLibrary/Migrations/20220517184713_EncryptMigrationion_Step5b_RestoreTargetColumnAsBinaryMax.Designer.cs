@@ -4,6 +4,7 @@ using EFCore6_Activity0201.DBLibrary;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFCore6_Activity0201.DBLibrary.Migrations
 {
     [DbContext(typeof(AdventureWorksContext))]
-    partial class AdventureWorksContextModelSnapshot : ModelSnapshot
+    [Migration("20220517184713_EncryptMigrationion_Step5b_RestoreTargetColumnAsBinaryMax")]
+    partial class EncryptMigrationion_Step5b_RestoreTargetColumnAsBinaryMax
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -834,6 +836,9 @@ namespace EFCore6_Activity0201.DBLibrary.Migrations
                         .HasColumnType("varbinary(max)")
                         .HasComment("Date of birth.");
 
+                    b.Property<DateTime>("BirthDateBackup")
+                        .HasColumnType("date");
+
                     b.Property<bool?>("CurrentFlag")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -846,15 +851,26 @@ namespace EFCore6_Activity0201.DBLibrary.Migrations
                         .HasColumnType("varbinary(max)")
                         .HasComment("M = Male, F = Female");
 
+                    b.Property<string>("GenderBackup")
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)");
+
                     b.Property<byte[]>("HireDate")
                         .IsRequired()
                         .HasColumnType("varbinary(max)")
                         .HasComment("Employee hired on this date.");
 
+                    b.Property<DateTime>("HireDateBackup")
+                        .HasColumnType("date");
+
                     b.Property<byte[]>("JobTitle")
                         .IsRequired()
                         .HasColumnType("varbinary(max)")
                         .HasComment("Work title such as Buyer or Sales Representative.");
+
+                    b.Property<string>("JobTitleBackup")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("LoginId")
                         .IsRequired()
@@ -868,11 +884,19 @@ namespace EFCore6_Activity0201.DBLibrary.Migrations
                         .HasColumnType("varbinary(max)")
                         .HasComment("M = Married, S = Single");
 
+                    b.Property<string>("MaritalStatusBackup")
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)");
+
                     b.Property<DateTime>("ModifiedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())")
                         .HasComment("Date and time the record was last updated.");
+
+                    b.Property<string>("NationalIDNumberBackup")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<byte[]>("NationalIdnumber")
                         .IsRequired()

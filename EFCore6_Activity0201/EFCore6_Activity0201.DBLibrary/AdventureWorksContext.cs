@@ -840,9 +840,6 @@ namespace EFCore6_Activity0201.DBLibrary
                 entity.HasIndex(e => e.LoginId, "AK_Employee_LoginID")
                     .IsUnique();
 
-                entity.HasIndex(e => e.NationalIdnumber, "AK_Employee_NationalIDNumber")
-                    .IsUnique();
-
                 entity.HasIndex(e => e.Rowguid, "AK_Employee_rowguid")
                     .IsUnique();
 
@@ -852,7 +849,6 @@ namespace EFCore6_Activity0201.DBLibrary
                     .HasComment("Primary key for Employee records.  Foreign key to BusinessEntity.BusinessEntityID.");
 
                 entity.Property(e => e.BirthDate)
-                    .HasColumnType("date")
                     .HasComment("Date of birth.");
 
                 entity.Property(e => e.CurrentFlag)
@@ -861,16 +857,14 @@ namespace EFCore6_Activity0201.DBLibrary
                     .HasComment("0 = Inactive, 1 = Active");
 
                 entity.Property(e => e.Gender)
-                    .HasMaxLength(1)
-                    .IsFixedLength()
+                    .IsRequired()
                     .HasComment("M = Male, F = Female");
 
                 entity.Property(e => e.HireDate)
-                    .HasColumnType("date")
                     .HasComment("Employee hired on this date.");
 
                 entity.Property(e => e.JobTitle)
-                    .HasMaxLength(50)
+                    .IsRequired()
                     .HasComment("Work title such as Buyer or Sales Representative.");
 
                 entity.Property(e => e.LoginId)
@@ -879,8 +873,7 @@ namespace EFCore6_Activity0201.DBLibrary
                     .HasComment("Network login.");
 
                 entity.Property(e => e.MaritalStatus)
-                    .HasMaxLength(1)
-                    .IsFixedLength()
+                    .IsRequired()
                     .HasComment("M = Married, S = Single");
 
                 entity.Property(e => e.ModifiedDate)
@@ -889,7 +882,7 @@ namespace EFCore6_Activity0201.DBLibrary
                     .HasComment("Date and time the record was last updated.");
 
                 entity.Property(e => e.NationalIdnumber)
-                    .HasMaxLength(15)
+                    .IsRequired()
                     .HasColumnName("NationalIDNumber")
                     .HasComment("Unique national identification number such as a social security number.");
 
